@@ -88,6 +88,7 @@ Enable detailed logging for troubleshooting:
     file_pattern: "dev*.values.yaml"
     new_tag: v1.0.1
     debug: "true"
+    repository_name: nginx
 ```
 
 Debug mode provides additional information such as:
@@ -124,6 +125,7 @@ jobs:
           verify_tag: "true"
           notification_webhook: ${{ secrets.DISCORD_WEBHOOK }}
           github_token: ${{ secrets.PAT }}
+          repository_name: nginx
 ```
 
 <br/>
@@ -146,6 +148,7 @@ jobs:
           new_tag: ${{ github.sha }}
           dry_run: "true"
           github_token: ${{ secrets.PAT }}
+          repository_name: nginx
 ```
 
 <br/>
@@ -197,8 +200,10 @@ jobs:
           new_tag: ${{ steps.vars.outputs.short_sha }}
           target_values_file: dev2
           branch: test
+          repository_name: nginx
           github_token: ${{ secrets.PAT }}
           DRY_RUN: true
+          
 
       - name: Run Image Tag Updater in the infrastructure repository
         uses: vonghuynh/image-tag-updater@v1
@@ -212,7 +217,7 @@ jobs:
           git_user_email: actions@github.com
           repo: vonghuynh/image-tag-updater
           file_pattern: "dev*.values.yaml"
-          registry_url: nginx
+          repository_name: nginx
 
       - name: Confirm Git log
         run: |

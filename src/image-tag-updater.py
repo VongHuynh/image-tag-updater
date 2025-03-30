@@ -22,6 +22,7 @@ def print_configuration():
     print(f"• Target path: {os.getenv('TARGET_PATH')}")
     print(f"• Target values file: {os.getenv('TARGET_VALUES_FILE')}")
     print(f"• New Tag: {os.getenv('NEW_TAG')}")
+    print(f"• Repository name: {os.getenv('REPOSITORY_NAME')}")
     print(f"• Branch: {os.getenv('BRANCH')}")
     print(f"• Commit message: {os.getenv('COMMIT_MESSAGE', 'Update tag')} {os.getenv('NEW_TAG')} in {os.getenv('TARGET_PATH')} ({os.getenv('TARGET_VALUES_FILE')} {os.getenv('FILE_PATTERN')})")
     print(f"• Create PR: {os.getenv('CREATE_PR')}")
@@ -115,7 +116,7 @@ def process_files():
     if os.getenv("DRY_RUN") == "true":
         print("✅ Dry run completed. No changes were made.")
         return
-    
+
 def run_command(command, allow_fail=False):
     debug_log(f"Executing: {command}")
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
