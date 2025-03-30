@@ -22,7 +22,7 @@ def print_configuration():
     print(f"• Target values file: {os.getenv('TARGET_VALUES_FILE')}")
     print(f"• New Tag: {os.getenv('NEW_TAG')}")
     print(f"• Branch: {os.getenv('BRANCH')}")
-    print(f"• Commit message: {os.getenv('COMMIT_MESSAGE', 'Update tag')} {os.getenv('NEW_TAG')} in {os.getenv('TARGET_PATH')} ({os.getenv('TARGET_VALUES_FILE')})")
+    print(f"• Commit message: {os.getenv('COMMIT_MESSAGE', 'Update tag')} {os.getenv('NEW_TAG')} in {os.getenv('TARGET_PATH')} ({os.getenv('TARGET_VALUES_FILE')} {os.getenv('FILE_PATTERN')})")
     print(f"• Create PR: {os.getenv('CREATE_PR')}")
     print("•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••\n")
 
