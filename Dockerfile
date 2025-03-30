@@ -22,8 +22,5 @@ COPY src/script.py /app/git_update_script.py
 # Make sure the script is executable
 RUN chmod +x /app/git_update_script.py
 
-# Fix Git ownership issue
-RUN git config --global --add safe.directory /github/workspace
-
 # Define entrypoint
 ENTRYPOINT ["python3", "/app/git_update_script.py"]

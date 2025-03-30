@@ -58,6 +58,7 @@ def run_command(command, allow_fail=False):
     return result.stdout.strip()
 
 def git_setup():
+    run_command("git config --global --add safe.directory /github/workspace") 
     run_command("git config --global user.name \"" + os.getenv("GIT_USER_NAME") + "\"")
     run_command("git config --global user.email \"" + os.getenv("GIT_USER_EMAIL") + "\"")
     run_command("git config --global pull.rebase false")
