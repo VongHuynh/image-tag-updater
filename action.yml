@@ -29,7 +29,7 @@ inputs:
   commit_message:
     description: 'Commit message for the update'
     required: false
-    default: '[Github Action] Update image tag in'
+    default: 'Github Action Update image tag '
   branch:
     description: 'Branch where changes should be committed'
     required: false

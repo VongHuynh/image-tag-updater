@@ -87,7 +87,7 @@ echo "• Target path: $TARGET_PATH"
 echo "• Target values: $TARGET_VALUES_FILE"
 echo "• New Tag: $NEW_TAG"
 echo "• Branch: $BRANCH"
-echo "• Commit message: $COMMIT_MESSAGE $TARGET_PATH($TARGET_VALUES_FILE)"
+echo "• Commit message: $COMMIT_MESSAGE $NEW_TAG in $TARGET_PATH ($TARGET_VALUES_FILE)"
 echo "• Create PR: $CREATE_PR"
 echo "•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"
 
@@ -182,7 +182,7 @@ git add . > /dev/null 2>&1 || handle_error "Failed to stage changes"
 if [[ -n "$FILE_PATTERN" ]]; then
     COMMIT_MESSAGE="$COMMIT_MESSAGE $TARGET_PATH ($FILE_PATTERN)"
 else
-    COMMIT_MESSAGE="$COMMIT_MESSAGE $TARGET_PATH ($TARGET_VALUES_FILE)"
+    COMMIT_MESSAGE="$COMMIT_MESSAGE $NEW_TAG in $TARGET_PATH ($TARGET_VALUES_FILE)"
 fi
 
 debug_log "\n💾 Creating commit..."
