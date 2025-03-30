@@ -7,7 +7,7 @@ RUN apk add --no-cache \
     gawk \
     sed \
     github-cli \
-    python3 
+    python3
 
 # Set working directory
 WORKDIR /app
