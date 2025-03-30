@@ -29,7 +29,7 @@ inputs:
   commit_message:
     description: 'Commit message for the update'
     required: false
-    default: 'Image Tag Updater - Update image tag'
+    default: 'Image Tag Updater Updated image tag'
   branch:
     description: 'Branch where changes should be committed'
     required: false
