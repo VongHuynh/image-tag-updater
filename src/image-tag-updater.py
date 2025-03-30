@@ -45,7 +45,7 @@ def update_file(file_path, new_tag, tag_string, backup=False, dry_run=False):
 
     if dry_run:
         print(f"Current tag in {file_path}: {tag_string}")
-        print(f"Would change to: {tag_string}: \"{new_tag}\"")
+        print(f"Would change to: {tag_string}: {new_tag}")
         return
 
     if backup:
@@ -61,7 +61,7 @@ def update_file(file_path, new_tag, tag_string, backup=False, dry_run=False):
     for line in content:
         match = pattern.match(line)
         if match:
-            new_line = f"{match.group(1)}\"{new_tag}\"\n"
+            new_line = f"{match.group(1)}{new_tag}\n"
             debug_log(f"🔄 Replacing: {line.strip()} → {new_line.strip()}")
             updated_content.append(new_line)
         else:
