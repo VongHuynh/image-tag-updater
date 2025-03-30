@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import re
 
 def print_header(message):
     print(f"\n==========================================")
@@ -41,24 +42,34 @@ def validate_env_vars():
 
 def update_file(file_path, new_tag, tag_string, backup=False, dry_run=False):
     debug_log(f"\n🔄 Processing file: {file_path}")
-    
+
     if dry_run:
         print(f"Current tag in {file_path}: {tag_string}")
         print(f"Would change to: {tag_string}: \"{new_tag}\"")
         return
-    
+
     if backup:
         subprocess.run(["cp", file_path, f"{file_path}.bak"], check=True)
         debug_log(f"✅ Backup created: {file_path}.bak")
-    
+
     with open(file_path, "r") as file:
-        content = file.read()
-    
-    content = content.replace(f"{tag_string}:", f"{tag_string}: \"{new_tag}\"")
-    
+        content = file.readlines()
+
+    updated_content = []
+    pattern = re.compile(rf"^(\s*{tag_string}:\s*)([^\s#]+)")
+
+    for line in content:
+        match = pattern.match(line)
+        if match:
+            new_line = f"{match.group(1)}\"{new_tag}\"\n"
+            debug_log(f"🔄 Replacing: {line.strip()} → {new_line.strip()}")
+            updated_content.append(new_line)
+        else:
+            updated_content.append(line)
+
     with open(file_path, "w") as file:
-        file.write(content)
-    
+        file.writelines(updated_content)
+
     print(f"✅ Updated {file_path}")
 
 def process_files():
