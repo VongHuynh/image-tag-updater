@@ -29,7 +29,7 @@ inputs:
   commit_message:
     description: 'Commit message for the update'
     required: false
-    default: 'Update image tag in'
+    default: '[Github Action] Update image tag in'
   branch:
     description: 'Branch where changes should be committed'
     required: false
@@ -61,10 +61,6 @@ inputs:
     description: 'Target branch for the pull request'
     required: false
     default: 'main'
-  pat: 
-    description: 'Personal Access Token for GitHub API'
-    required: false
-    default: ''
   dry_run:
     description: 'Run in dry-run mode without making actual changes'
     required: false
@@ -83,7 +79,6 @@ runs:
     NEW_TAG: ${{ inputs.new_tag}}
     TARGET_VALUES_FILE: ${{ inputs.target_values_file }}
     GITHUB_TOKEN: ${{ inputs.github_token }}
-    PAT: ${{ inputs.pat }}
     COMMIT_MESSAGE: ${{ inputs.commit_message }}
     BRANCH: ${{ inputs.branch }}
     GIT_USER_NAME: ${{ inputs.git_user_name }}

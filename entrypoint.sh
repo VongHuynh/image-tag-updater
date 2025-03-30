@@ -82,10 +82,15 @@ print_header "Starting Git Update Process"
 validate_env_vars
 
 # Print current configuration
-echo "📋 Configuration:"
-echo "• Path: $TARGET_PATH"
-echo "• Tag: $NEW_TAG"
+echo "••••••••••••••••••••••• 📋 Configuration: •••••••••••••••••••••••••••••••••••••••••••"
+echo "• Target path: $TARGET_PATH"
+echo "• Target values: $TARGET_VALUES_FILE"
+echo "• New Tag: $NEW_TAG"
 echo "• Branch: $BRANCH"
+echo "• Commit message: $COMMIT_MESSAGE $TARGET_PATH($TARGET_VALUES_FILE)"
+echo "• Create PR: $CREATE_PR"
+echo "•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"
+
 [[ "$DRY_RUN" == "true" ]] && echo "• Mode: Dry Run"
 [[ -n "$TARGET_VALUES_FILE" ]] && echo "• File: $TARGET_VALUES_FILE"
 [[ -n "$FILE_PATTERN" ]] && echo "• Pattern: $FILE_PATTERN"
@@ -208,20 +213,19 @@ if [[ "$CREATE_PR" == "true" ]]; then
     echo "Authenticating with GitHub..."
 # Authenticate with GitHub using GITHUB_TOKEN, fallback to PAT if it fails
     GH_TOKEN="$GITHUB_TOKEN" gh auth status || {
-        echo "⚠️ GITHUB_TOKEN authentication failed, trying PAT..."
-        echo "$PAT" | gh auth login --with-token || {
-            echo "❌ Failed to authenticate with both GITHUB_TOKEN and PAT"
-            exit 1
+        handle_error "GITHUB_TOKEN authentication failed, trying PAT..."
+        echo "$GITHUB_TOKEN" | gh auth login --with-token || {
+            handle_error "Failed to authenticate with both GITHUB_TOKEN and PAT"
         }
     }
     echo "🚀 Creating a pull request to $TARGET_BRANCH_PR..."
     gh pr create --base "$TARGET_BRANCH_PR" --head "$BRANCH" \
-        --title "Automated PR: Merging $BRANCH into $TARGET_BRANCH_PR" \
-        --body "This PR was automatically created by the CI/CD pipeline." || {
+        --title "Automated PR by Github Action: Merging $BRANCH into $TARGET_BRANCH_PR" \
+        --body "This PR was created by Github Action for change image to deploy new version" || {
         echo "❌ Failed to create pull request"
         exit 1
     }
     echo "✅ Pull request created successfully!"
 fi
 
-print_header "Process Completed Successfully"
+print_header " Process Completed Successfully"
