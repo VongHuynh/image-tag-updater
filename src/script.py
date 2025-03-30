@@ -15,6 +15,17 @@ def debug_log(message):
     if os.getenv("DEBUG", "false").lower() == "true":
         print(message)
 
+def print_configuration():
+    print("\n••••••••••••••••••••••• 📋 Configuration: ••••••••••••••••••••••••••••••••••")
+    print(f"• Target repo: {os.getenv('REPO')}")
+    print(f"• Target path: {os.getenv('TARGET_PATH')}")
+    print(f"• Target values file: {os.getenv('TARGET_VALUES_FILE')}")
+    print(f"• New Tag: {os.getenv('NEW_TAG')}")
+    print(f"• Branch: {os.getenv('BRANCH')}")
+    print(f"• Commit message: {os.getenv('COMMIT_MESSAGE', 'Update tag')} {os.getenv('NEW_TAG')} in {os.getenv('TARGET_PATH')} ({os.getenv('TARGET_VALUES_FILE')})")
+    print(f"• Create PR: {os.getenv('CREATE_PR')}")
+    print("•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••\n")
+
 def validate_env_vars():
     required_vars = [
         "TARGET_PATH", "NEW_TAG", "TAG_STRING", "GIT_USER_NAME", "GIT_USER_EMAIL", 
@@ -102,6 +113,7 @@ def create_pull_request():
 
 def main():
     print_header("Starting Git Update Process")
+    print_configuration()
     validate_env_vars()
     git_setup()
     

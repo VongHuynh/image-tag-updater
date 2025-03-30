@@ -1,17 +1,14 @@
-# Use an official Python image as a base
-FROM python:3.10-slim
+# Use a lightweight base image
+FROM alpine:3.21
 
-# Install necessary dependencies
-RUN apt-get update && apt-get install -y \
+# Install necessary packages
+RUN apk add --no-cache \
     git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install GitHub CLI
-RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /usr/share/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
-    echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
-    apt-get update && apt-get install -y gh && \
-    rm -rf /var/lib/apt/lists/*
+    bash \
+    gawk \
+    sed \
+    github-cli \
+    python3 
 
 # Set working directory
 WORKDIR /app
