@@ -236,13 +236,6 @@ jobs:
   `target_values_file` (e.g., "dev1.values.yaml") to specify which files to update. Only one
   of these options is required.
 
-<br/>
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-<br/>
 
 ## Contributing
 
