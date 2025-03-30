@@ -30,7 +30,7 @@ def print_configuration():
 def validate_env_vars():
     required_vars = [
         "TARGET_PATH", "NEW_TAG", "TAG_STRING", "GIT_USER_NAME", "GIT_USER_EMAIL", 
-        "GITHUB_TOKEN", "REPO", "BRANCH"
+        "GITHUB_TOKEN", "REPO", "BRANCH", "REPOSITORY_NAME"
     ]
     
     for var in required_vars:
@@ -40,12 +40,12 @@ def validate_env_vars():
     if not os.getenv("TARGET_VALUES_FILE") and not os.getenv("FILE_PATTERN"):
         handle_error("Either TARGET_VALUES_FILE or FILE_PATTERN must be set")
 
-def update_file(file_path, new_tag, tag_string, backup=False, dry_run=False):
+
+def update_file(file_path, new_tag, repository_name, backup=False, dry_run=False):
     debug_log(f"\n🔄 Processing file: {file_path}")
 
     if dry_run:
-        print(f"Current tag in {file_path}: {tag_string}")
-        print(f"Would change to: {tag_string}: {new_tag}")
+        print(f"Would update tag for repository: {repository_name} in {file_path} to {new_tag}")
         return
 
     if backup:
@@ -56,21 +56,36 @@ def update_file(file_path, new_tag, tag_string, backup=False, dry_run=False):
         content = file.readlines()
 
     updated_content = []
-    pattern = re.compile(rf"^(\s*{tag_string}:\s*)([^\s#]+)")
+    inside_image_block = False
+    found_repository = False
 
     for line in content:
-        match = pattern.match(line)
-        if match:
-            new_line = f"{match.group(1)}{new_tag}\n"
-            debug_log(f"🔄 Replacing: {line.strip()} → {new_line.strip()}")
-            updated_content.append(new_line)
-        else:
+        stripped_line = line.strip()
+
+        if stripped_line.startswith("image:"):
+            inside_image_block = True
             updated_content.append(line)
+            continue
+
+        if inside_image_block:
+            if stripped_line.startswith("repository:"):
+                repo_match = re.search(r"repository:\s*(\S+)", stripped_line)
+                if repo_match and repo_match.group(1) == repository_name:
+                    found_repository = True
+
+            if stripped_line.startswith("tag:") and found_repository:
+                debug_log(f"🔄 Replacing: {line.strip()} → tag: {new_tag}")
+                updated_content.append(re.sub(r"tag:\s*\S+", f"tag: {new_tag}", line))
+                inside_image_block = False
+                continue
+
+        updated_content.append(line)
 
     with open(file_path, "w") as file:
         file.writelines(updated_content)
 
     print(f"✅ Updated {file_path}")
+
 
 def process_files():
     os.chdir(os.getenv("TARGET_PATH"))
@@ -80,10 +95,10 @@ def process_files():
     if file_pattern:
         for file in os.listdir():
             if file_pattern in file:
-                update_file(file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
+                update_file(file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), repository_name=os.getenv("REPOSITORY_NAME"),backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
     elif target_file:
         if os.path.exists(target_file):
-            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
+            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), repository_name=os.getenv("REPOSITORY_NAME"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
         else:
             handle_error(f"File not found: {target_file}")
     

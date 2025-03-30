@@ -19,6 +19,9 @@ inputs:
   new_tag:
     description: 'The new image tag to replace the current one'
     required: true
+  repository_name:
+    description: 'The name of the repository to update'
+    required: true
   target_values_file:
     description:
       'The name of the values file to update'
@@ -77,6 +80,7 @@ runs:
     TARGET_PATH: ${{ inputs.target_path }}
     TAG_STRING: ${{ inputs.tag_string }}
     NEW_TAG: ${{ inputs.new_tag}}
+    REPOSITORY_NAME: ${{ inputs.repository_name }}
     TARGET_VALUES_FILE: ${{ inputs.target_values_file }}
     GITHUB_TOKEN: ${{ inputs.github_token }}
     COMMIT_MESSAGE: ${{ inputs.commit_message }}
