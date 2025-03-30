@@ -87,10 +87,11 @@ def update_file(file_path, new_tag, repository_name, tag_string="tag", backup=Fa
                 updated_content.append(f"{indent}{tag_string}: {new_tag}\n")  # Reinsert indentation
                 inside_image_block = False  # Reset tracking
                 continue
-            else:
-                handle_error ("Not found repository_name in image block")
 
         updated_content.append(line)
+
+    if not found_repository:
+        handle_error(" Not found repository_name in image block")
 
     with open(file_path, "w") as file:
         file.writelines(updated_content)
