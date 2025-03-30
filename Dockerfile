@@ -17,10 +17,13 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | t
 WORKDIR /app
 
 # Copy the Python script into the container
-COPY src/script.py /app/git_update_script.py
+COPY git_update_script.py /app/git_update_script.py
 
 # Make sure the script is executable
 RUN chmod +x /app/git_update_script.py
+
+# Fix Git ownership issue
+RUN git config --global --add safe.directory /github/workspace
 
 # Define entrypoint
 ENTRYPOINT ["python3", "/app/git_update_script.py"]
