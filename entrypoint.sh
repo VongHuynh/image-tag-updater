@@ -183,13 +183,29 @@ fi
 debug_log "\n💾 Creating commit..."
 git commit -m "$COMMIT_MESSAGE" > /dev/null 2>&1 || handle_error "Failed to commit changes"
 
+# Push changes with retry logic
+MAX_RETRIES=3
+RETRY_COUNT=0
+while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+    if git push "https://x-access-token:$GITHUB_TOKEN@github.com/$REPO" "$BRANCH" > /dev/null 2>&1; then
+        echo "✅ Successfully pushed changes to $BRANCH"
+        break
+    else
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        if [[ $RETRY_COUNT -eq $MAX_RETRIES ]]; then
+            handle_error "Failed to push changes after $MAX_RETRIES attempts"
+        fi
+        debug_log "⚠️ Push failed, retrying... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
+        sleep 5
+    fi
+done
+
 # Create Pull Request only if CREATE_PR is explicitly set to "true"
 if [[ "$CREATE_PR" == "true" ]]; then
     if [[ -z "$TARGET_BRANCH_PR" ]]; then
         TARGET_BRANCH_PR="main"
     fi
     echo "Authenticating with GitHub..."
-    # Authenticate with GitHub using the environment variable token
 # Authenticate with GitHub using GITHUB_TOKEN, fallback to PAT if it fails
     GH_TOKEN="$GITHUB_TOKEN" gh auth status || {
         echo "⚠️ GITHUB_TOKEN authentication failed, trying PAT..."
@@ -206,22 +222,6 @@ if [[ "$CREATE_PR" == "true" ]]; then
         exit 1
     }
     echo "✅ Pull request created successfully!"
-else
-# Push changes with retry logic
-    MAX_RETRIES=3
-    RETRY_COUNT=0
-    while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
-        if git push "https://x-access-token:$GITHUB_TOKEN@github.com/$REPO" "$BRANCH" > /dev/null 2>&1; then
-            echo "✅ Successfully pushed changes to $BRANCH"
-            break
-        else
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [[ $RETRY_COUNT -eq $MAX_RETRIES ]]; then
-                handle_error "Failed to push changes after $MAX_RETRIES attempts"
-            fi
-            debug_log "⚠️ Push failed, retrying... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep 5
-        fi
-    done
 fi
+
 print_header "Process Completed Successfully"
