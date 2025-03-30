@@ -42,6 +42,8 @@ repositories.
 | `branch`             | No       | The branch where changes should be committed                                  | `"main"`               |
 | `git_user_name`      | No       | The Git username for commits                                                  | `"GitHub Action"`      |
 | `git_user_email`     | No       | The Git email for commits                                                     | `"actions@github.com"` |
+| `create_pr`          | No       | Whether to create a pull request after the update                             | `"false"`              |
+| `target_branch_pr`   | No       | Target branch for the pull request                                            | `"false"`              |
 | `backup`             | No       | Specifies whether to create a backup file (true/false)                        | `"false"`              |
 | `repo`               | Yes      | Git repository for commits (Repo to update)                                   | N/A                    |
 | `file_pattern`       | No       | File pattern to match multiple files (e.g., "*.values.yaml")                  | `""`                   |
