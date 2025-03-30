@@ -6,7 +6,8 @@ RUN apk add --no-cache \
     git \
     bash \
     gawk \
-    sed 
+    sed \
+    github-cli
 
 # Set the working directory inside the container    
 WORKDIR /usr/src

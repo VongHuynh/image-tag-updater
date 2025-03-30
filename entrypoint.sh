@@ -183,21 +183,41 @@ fi
 debug_log "\n💾 Creating commit..."
 git commit -m "$COMMIT_MESSAGE" > /dev/null 2>&1 || handle_error "Failed to commit changes"
 
-# Push changes with retry logic
-MAX_RETRIES=3
-RETRY_COUNT=0
-while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
-    if git push "https://x-access-token:$GITHUB_TOKEN@github.com/$REPO" "$BRANCH" > /dev/null 2>&1; then
-        echo "✅ Successfully pushed changes to $BRANCH"
-        break
-    else
-        RETRY_COUNT=$((RETRY_COUNT + 1))
-        if [[ $RETRY_COUNT -eq $MAX_RETRIES ]]; then
-            handle_error "Failed to push changes after $MAX_RETRIES attempts"
-        fi
-        debug_log "⚠️ Push failed, retrying... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-        sleep 5
+# Create Pull Request only if CREATE_PR is explicitly set to "true"
+if [[ "$CREATE_PR" == "true" ]]; then
+    if [[ -z "$TARGET_BRANCH_PR" ]]; then
+        TARGET_BRANCH_PR="main"
     fi
-done
-
+    echo "Authenticating with GitHub..."
+    # Authenticate with GitHub using the environment variable token
+    echo "$GITHUB_TOKEN" | gh auth login --with-token || {
+        echo "❌ Failed to authenticate with GitHub"
+        exit 1
+    }
+    echo "🚀 Creating a pull request to $TARGET_BRANCH_PR..."
+    gh pr create --base "$TARGET_BRANCH_PR" --head "$BRANCH" \
+        --title "Automated PR: Merging $BRANCH into $TARGET_BRANCH_PR" \
+        --body "This PR was automatically created by the CI/CD pipeline." || {
+        echo "❌ Failed to create pull request"
+        exit 1
+    }
+    echo "✅ Pull request created successfully!"
+else
+# Push changes with retry logic
+    MAX_RETRIES=3
+    RETRY_COUNT=0
+    while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+        if git push "https://x-access-token:$GITHUB_TOKEN@github.com/$REPO" "$BRANCH" > /dev/null 2>&1; then
+            echo "✅ Successfully pushed changes to $BRANCH"
+            break
+        else
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [[ $RETRY_COUNT -eq $MAX_RETRIES ]]; then
+                handle_error "Failed to push changes after $MAX_RETRIES attempts"
+            fi
+            debug_log "⚠️ Push failed, retrying... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
+            sleep 5
+        fi
+    done
+fi
 print_header "Process Completed Successfully"

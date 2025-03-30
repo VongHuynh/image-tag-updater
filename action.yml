@@ -53,6 +53,14 @@ inputs:
     description: 'File pattern to match multiple files (e.g., "*.values.yaml")'
     required: false
     default: ''
+  create_pr:
+    description: 'Whether to create a pull request after the update (true/false)'
+    required: false
+    default: 'false'
+  target_branch_pr:
+    description: 'Target branch for the pull request'
+    required: false
+    default: 'main'
   dry_run:
     description: 'Run in dry-run mode without making actual changes'
     required: false
@@ -79,4 +87,6 @@ runs:
     REPO: ${{ inputs.REPO }}
     FILE_PATTERN: ${{ inputs.file_pattern }}
     DRY_RUN: ${{ inputs.dry_run }}
+    CREATE_PR: ${{ inputs.create_pr }}
+    TARGET_BRANCH_PR: ${{ inputs.target_branch_pr }}
     DEBUG: ${{ inputs.debug }}
