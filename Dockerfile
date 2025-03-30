@@ -14,10 +14,10 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 # Copy the Python script into the container
-COPY src/script.py /app/git_update_script.py
+COPY src/image-tag-updater.py /app/image-tag-updater.py
 
 # Make sure the script is executable
-RUN chmod +x /app/git_update_script.py
+RUN chmod +x /app/image-tag-updater.py
 
 # Define entrypoint
-ENTRYPOINT ["python3", "/app/git_update_script.py"]
+ENTRYPOINT ["python3", "/app/image-tag-updater.py"]

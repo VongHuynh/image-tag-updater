@@ -61,6 +61,25 @@ def update_file(file_path, new_tag, tag_string, backup=False, dry_run=False):
     
     print(f"✅ Updated {file_path}")
 
+def process_files():
+    os.chdir(os.getenv("TARGET_PATH"))
+    file_pattern = os.getenv("FILE_PATTERN")
+    target_file = os.getenv("TARGET_VALUES_FILE")
+    
+    if file_pattern:
+        for file in os.listdir():
+            if file_pattern in file:
+                update_file(file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
+    elif target_file:
+        if os.path.exists(target_file):
+            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
+        else:
+            handle_error(f"File not found: {target_file}")
+    
+    if os.getenv("DRY_RUN") == "true":
+        print("✅ Dry run completed. No changes were made.")
+        return
+    
 def run_command(command, allow_fail=False):
     debug_log(f"Executing: {command}")
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -107,8 +126,10 @@ def git_commit_push():
 def create_pull_request():
     if os.getenv("CREATE_PR") == "true":
         target_branch = os.getenv("TARGET_BRANCH_PR", "main")
+        branch = os.getenv("BRANCH", "main")
+
         run_command("echo $GITHUB_TOKEN | gh auth login --with-token", allow_fail=True)
-        run_command(f"gh pr create --base {target_branch} --head {os.getenv('BRANCH')} --title \"Automated PR\" --body \"Automated PR for updating tags\"")
+        run_command(f"gh pr create --base {target_branch} --head {branch} --title \"Automated PR by Github Action: Merging {branch} into {target_branch}\" --body \"This PR was created by Github Action for change image to deploy new version\"")
         print("✅ Pull request created successfully!")
 
 def main():
@@ -116,26 +137,7 @@ def main():
     print_configuration()
     validate_env_vars()
     git_setup()
-    
-    os.chdir(os.getenv("TARGET_PATH"))
-    
-    file_pattern = os.getenv("FILE_PATTERN")
-    target_file = os.getenv("TARGET_VALUES_FILE")
-    
-    if file_pattern:
-        for file in os.listdir():
-            if file_pattern in file:
-                update_file(file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
-    elif target_file:
-        if os.path.exists(target_file):
-            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
-        else:
-            handle_error(f"File not found: {target_file}")
-    
-    if os.getenv("DRY_RUN") == "true":
-        print("✅ Dry run completed. No changes were made.")
-        return
-    
+    process_files()
     git_commit_push()
     create_pull_request()
     print_header("Process Completed Successfully")
