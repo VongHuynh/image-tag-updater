@@ -95,10 +95,10 @@ def process_files():
     if file_pattern:
         for file in os.listdir():
             if file_pattern in file:
-                update_file(file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), repository_name=os.getenv("REPOSITORY_NAME"),backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
+                update_file(file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), os.getenv("REPOSITORY_NAME"),backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
     elif target_file:
         if os.path.exists(target_file):
-            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), repository_name=os.getenv("REPOSITORY_NAME"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
+            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), os.getenv("REPOSITORY_NAME"), backup=os.getenv("BACKUP") == "true", dry_run=os.getenv("DRY_RUN") == "true")
         else:
             handle_error(f"File not found: {target_file}")
     
