@@ -41,11 +41,14 @@ def validate_env_vars():
         handle_error("Either TARGET_VALUES_FILE or FILE_PATTERN must be set")
 
 
-def update_file(file_path, new_tag, repository_name, backup=False, dry_run=False):
+import re
+import subprocess
+
+def update_file(file_path, new_tag, repository_name, tag_string="tag", backup=False, dry_run=False):
     debug_log(f"\n🔄 Processing file: {file_path}")
 
     if dry_run:
-        print(f"Would update tag for repository: {repository_name} in {file_path} to {new_tag}")
+        print(f"Would update `{tag_string}` for repository `{repository_name}` in {file_path} to `{new_tag}`")
         return
 
     if backup:
@@ -62,21 +65,25 @@ def update_file(file_path, new_tag, repository_name, backup=False, dry_run=False
     for line in content:
         stripped_line = line.strip()
 
+        # check when in block `image:`
         if stripped_line.startswith("image:"):
             inside_image_block = True
+            found_repository = False 
             updated_content.append(line)
             continue
 
         if inside_image_block:
-            if stripped_line.startswith("repository:"):
-                repo_match = re.search(r"repository:\s*(\S+)", stripped_line)
-                if repo_match and repo_match.group(1) == repository_name:
-                    found_repository = True
+            # check repository:
+            repo_match = re.match(rf"^\s*repository:\s*(\S+)", stripped_line)
+            if repo_match and repo_match.group(1) == repository_name:
+                found_repository = True
 
-            if stripped_line.startswith("tag:") and found_repository:
-                debug_log(f"🔄 Replacing: {line.strip()} → tag: {new_tag}")
-                updated_content.append(re.sub(r"tag:\s*\S+", f"tag: {new_tag}", line))
-                inside_image_block = False
+            # if repository have tag_string, updates tag
+            tag_match = re.match(rf"^\s*{tag_string}:\s*(\S+)", stripped_line)
+            if tag_match and found_repository:
+                debug_log(f"🔄 Replacing: {line.strip()} → {tag_string}: {new_tag}")
+                updated_content.append(re.sub(rf"^\s*{tag_string}:\s*\S+", f"{tag_string}: {new_tag}", line))
+                inside_image_block = False 
                 continue
 
         updated_content.append(line)
@@ -95,10 +102,10 @@ def process_files():
     if file_pattern:
         for file in os.listdir():
             if file_pattern in file:
-                update_file(file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), os.getenv("REPOSITORY_NAME"),os.getenv("BACKUP"), os.getenv("DRY_RUN"))
+                update_file(file, os.getenv("NEW_TAG"), os.getenv("REPOSITORY_NAME"), os.getenv("TAG_STRING"), os.getenv("BACKUP"), os.getenv("DRY_RUN"))
     elif target_file:
         if os.path.exists(target_file):
-            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("TAG_STRING"), os.getenv("REPOSITORY_NAME"), os.getenv("BACKUP"), os.getenv("DRY_RUN"))
+            update_file(target_file, os.getenv("NEW_TAG"), os.getenv("REPOSITORY_NAME"), os.getenv("TAG_STRING"), os.getenv("BACKUP"), os.getenv("DRY_RUN"))
         else:
             handle_error(f"File not found: {target_file}")
     
