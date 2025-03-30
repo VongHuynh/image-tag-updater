@@ -82,9 +82,10 @@ print_header "Starting Git Update Process"
 validate_env_vars
 
 # Print current configuration
-echo "••••••••••••••••••••••• 📋 Configuration: •••••••••••••••••••••••••••••••••••••••••••"
+echo "••••••••••••••••••••••• 📋 Configuration: ••••••••••••••••••••••••••••••••••"
+echo "• Target repo: $REPO"
 echo "• Target path: $TARGET_PATH"
-echo "• Target values: $TARGET_VALUES_FILE"
+echo "• Target values file: $TARGET_VALUES_FILE"
 echo "• New Tag: $NEW_TAG"
 echo "• Branch: $BRANCH"
 echo "• Commit message: $COMMIT_MESSAGE $NEW_TAG in $TARGET_PATH ($TARGET_VALUES_FILE)"
