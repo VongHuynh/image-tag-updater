@@ -190,9 +190,13 @@ if [[ "$CREATE_PR" == "true" ]]; then
     fi
     echo "Authenticating with GitHub..."
     # Authenticate with GitHub using the environment variable token
-    echo "$GITHUB_TOKEN" | gh auth login --with-token || {
-        echo "❌ Failed to authenticate with GitHub"
-        exit 1
+# Authenticate with GitHub using GITHUB_TOKEN, fallback to PAT if it fails
+    GH_TOKEN="$GITHUB_TOKEN" gh auth status || {
+        echo "⚠️ GITHUB_TOKEN authentication failed, trying PAT..."
+        echo "$PAT" | gh auth login --with-token || {
+            echo "❌ Failed to authenticate with both GITHUB_TOKEN and PAT"
+            exit 1
+        }
     }
     echo "🚀 Creating a pull request to $TARGET_BRANCH_PR..."
     gh pr create --base "$TARGET_BRANCH_PR" --head "$BRANCH" \
