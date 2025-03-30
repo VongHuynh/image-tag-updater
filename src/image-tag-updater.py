@@ -79,12 +79,14 @@ def update_file(file_path, new_tag, repository_name, tag_string="tag", backup=Fa
                 found_repository = True
 
             # if repository have tag_string, updates tag
-            tag_match = re.match(rf"^\s*{tag_string}:\s*(\S+)", stripped_line)
+            tag_match = re.match(rf"^(\s*){tag_string}:\s*(\S+)", line)
             if tag_match and found_repository:
+                indent = tag_match.group(1)  # Preserve leading spaces
                 debug_log(f"🔄 Replacing: {line.strip()} → {tag_string}: {new_tag}")
-                updated_content.append(re.sub(rf"^\s*{tag_string}:\s*\S+", f"{tag_string}: {new_tag}", line))
-                inside_image_block = False 
+                updated_content.append(f"{indent}{tag_string}: {new_tag}\n")  # Reinsert indentation
+                inside_image_block = False  # Reset tracking
                 continue
+
 
         updated_content.append(line)
 
